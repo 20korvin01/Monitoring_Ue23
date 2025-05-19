@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.io
+from plots import plot_neigungsdaten, plot_delta_t
 
 ###! Loading data
 mat_contents = scipy.io.loadmat('data/Neigung.mat')
@@ -7,4 +8,10 @@ mat_contents = scipy.io.loadmat('data/Neigung.mat')
 neigung_zeitreihe = np.array(mat_contents['N']) 
 
 
-print(neigung_zeitreihe)
+if __name__ == "__main__":
+    # Anzeigen der rohen Neigungsdaten
+    plot_neigungsdaten(neigung_zeitreihe)
+    
+    # Auffinden von Datenlücken
+    # --> dazu Berechnen der Differenzen der Zeitstempel (dort wo Differenz > 120s)
+    plot_delta_t(neigung_zeitreihe[:, 3])
