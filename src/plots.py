@@ -35,7 +35,9 @@ def plot_neigungsdaten(neigung_zeitreihe):
     plt.ylabel('Temperatur [°C]')
 
     plt.tight_layout()
+    plt.savefig('plots/neigung_zeitreihe.png')
     plt.show()
+    
     
     
 def plot_delta_t(timestamps):
@@ -62,7 +64,9 @@ def plot_delta_t(timestamps):
     plt.ylabel('Δt [s]')
     plt.legend()
     plt.tight_layout()
+    plt.savefig('plots/delta_t.png')
     plt.show()
+    
     
     
 def plot_autokovarianz(cov_x, cov_y, cov_t):
@@ -96,7 +100,9 @@ def plot_autokovarianz(cov_x, cov_y, cov_t):
     plt.ylabel('Autokovarianz')   
     
     plt.tight_layout()
-    plt.show()   
+    plt.savefig('plots/autokovarianz_zeitreihe.png')
+    plt.show()
+    
     
     
 def plot_autokorrelation(acf_x, acf_y, acf_t):
@@ -130,7 +136,9 @@ def plot_autokorrelation(acf_x, acf_y, acf_t):
     plt.ylabel('Autokorrelationskoeffizient')   
     
     plt.tight_layout()
+    plt.savefig('plots/autokorrelation_zeitreihe.png')
     plt.show()
+    
     
     
 def plot_kreuzkovarianz(crosscov_xy, crosscov_xt, crosscov_yt):
@@ -164,7 +172,9 @@ def plot_kreuzkovarianz(crosscov_xy, crosscov_xt, crosscov_yt):
     plt.ylabel('Kreuzkovarianz')   
     
     plt.tight_layout()
+    plt.savefig('plots/kreuzkovarianz_zeitreihe.png')
     plt.show()
+    
     
     
 def plot_kreuzkorrelation(crosscorr_xy, crosscorr_xt, crosscorr_yt):
@@ -198,4 +208,5 @@ def plot_kreuzkorrelation(crosscorr_xy, crosscorr_xt, crosscorr_yt):
     plt.ylabel('Kreuzkorrelationskoeffizient')   
     
     plt.tight_layout()
+    plt.savefig('plots/kreuzkorrelation_zeitreihe.png')
     plt.show()

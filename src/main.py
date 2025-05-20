@@ -96,14 +96,14 @@ if __name__ == "__main__":
     t = neigung_zeitreihe[:, 3]
     n = len(t)
     # Plotten der Messwerte
-    # plot_neigungsdaten(neigung_zeitreihe)
+    plot_neigungsdaten(neigung_zeitreihe)
        
     
     ### AUFGABE 1 ####################################################################################
     """Aufbereitung der Messwerte"""
     ## 1.1 Anschauliche Darstellung der Datenlücken ----------------------------------------------- ##
     # --> dazu Berechnen der Differenzen der Zeitstempel (dort wo Differenz > 120s)
-    # plot_delta_t(neigung_zeitreihe[:, 3])
+    plot_delta_t(neigung_zeitreihe[:, 3])
     
     ## 1.2 Füllen der Datenlücken durch lineare Interpolation ------------------------------------- ##
     # Abtastintervall
@@ -141,8 +141,8 @@ if __name__ == "__main__":
     acf_t = autocorrelation(temperatur_interp_detrend, cov_t)
     
     ## 2.2 Darstellung der Autokovarianz- und Autokorrelationsfunktionen ------------------------- ##
-    # plot_autokovarianz(cov_x, cov_y, cov_t)
-    # plot_autokorrelation(acf_x, acf_y, acf_t)
+    plot_autokovarianz(cov_x, cov_y, cov_t)
+    plot_autokorrelation(acf_x, acf_y, acf_t)
     
     ## 2.3 Interpretation der Verläufe der Autokorrelationsfunktionen ---------------------------- ##
     
@@ -163,8 +163,8 @@ if __name__ == "__main__":
     crosscorr_yt = crosscorrelation(neigung_y_interp_detrend, temperatur_interp_detrend, crosscov_yt)
     
     ## 3.2 Darstellung der Kreuzkovarianz- und -korrelationsfunktionen --------------------------- ##
-    # plot_kreuzkovarianz(crosscov_xy, crosscov_xt, crosscov_yt)
-    # plot_kreuzkorrelation(crosscorr_xy, crosscorr_xt, crosscorr_yt)
+    plot_kreuzkovarianz(crosscov_xy, crosscov_xt, crosscov_yt)
+    plot_kreuzkorrelation(crosscorr_xy, crosscorr_xt, crosscorr_yt)
     
     ## 3.3 Interpretation der Verläufe der Kreuzkorrelationsfunktionen --------------------------- ##
     
