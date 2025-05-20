@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 
 def linear_interpolation(timestamps, values, t_new):
     """
-    Interpoliert die Werte auf die neuen Zeitstempel t_new
-    mithilfe der linearen Interpolation.
+    Interpoliert die Werte auf die neuen Zeitstempel
+    t_new mithilfe der linearen Interpolation.
     """
     values_interp = np.zeros(len(t_new))
     for i in range(len(t_new)):
@@ -26,6 +26,41 @@ def linear_interpolation(timestamps, values, t_new):
     return values_interp
 
 
+def linear_regression(t, y):
+    """
+    Berechnet die lineare Regression der Daten y in Abhängigkeit von t.
+    """
+    # Berechnung der Koeffizienten
+    n = len(t)
+    m = (n * np.sum(t * y) - np.sum(t) * np.sum(y)) / (n * np.sum(t**2) - np.sum(t)**2)
+    b = (np.sum(y) - m * np.sum(t)) / n
+    
+    # Berechnung der Regressionsgeraden
+    y_trend = m * t + b
+    return y_trend
+
+
+def discrete_autocovariance(x, lag):
+    """
+    Berechnet die diskrete Autokovarianz der Zeitreihe x mit dem angegebenen Lag (k)
+    """
+    n = len(x)
+    mean_x = np.mean(x)
+    cov_x = np.zeros(lag)
+    for k in range(lag):
+        cov_x[k] = np.sum((x[:n-k] - mean_x) * (x[k:] - mean_x)) / (n - k - 1)
+    return cov_x
+
+def autocorrelation(x, cov_x):
+    """
+    Berechnet die Autokorrelation der Zeitreihe x
+    """
+    var_x = np.var(x)
+    acf = cov_x / var_x
+    return acf
+    
+
+
 if __name__ == "__main__":   
     
     ### AUFGABE 0 #####################################################################################
@@ -38,6 +73,7 @@ if __name__ == "__main__":
     neigung_y = neigung_zeitreihe[:, 1]
     temperatur = neigung_zeitreihe[:, 2]
     t = neigung_zeitreihe[:, 3]
+    n = len(t)
     # Plotten der Messwerte
     # plot_neigungsdaten(neigung_zeitreihe)
        
@@ -51,8 +87,6 @@ if __name__ == "__main__":
     ## 1.2 Füllen der Datenlücken durch lineare Interpolation -------------------------------------- ##
     # Abtastintervall
     dT = 120
-    # Differenzen der Zeitstempel
-    delta_t = np.diff(t)
     # Start- und Endzeit
     t_start = t[0]
     t_end = t[-1]
@@ -62,6 +96,53 @@ if __name__ == "__main__":
     neigung_x_interp = linear_interpolation(t, neigung_x, t_new)
     neigung_y_interp = linear_interpolation(t, neigung_y, t_new)
     temperatur_interp = linear_interpolation(t, temperatur, t_new)
+    
+    ## 1.3 Beseitigung vorhandener (linearer) Trends ---------------------------------------------- ##
+    # Berechnung der linearen Regression (y = mx + b)
+    neigung_x_trend = linear_regression(t_new, neigung_x_interp)
+    neigung_y_trend = linear_regression(t_new, neigung_y_interp)
+    temperatur_trend = linear_regression(t_new, temperatur_interp)
+    # Subtraktion der Trends -> stationäre Zeitreihen
+    neigung_x_interp_detrend = neigung_x_interp - neigung_x_trend + neigung_x_trend[0]
+    neigung_y_interp_detrend = neigung_y_interp - neigung_y_trend + neigung_y_trend[0]
+    temperatur_interp_detrend = temperatur_interp - temperatur_trend + temperatur_trend[0]
+    
+    
+    ### AUFGABE 2 ###################################################################################
+    """Autokovarianz"""
+    ## 2.1 Berechnung der Autokovarianz- und Autokorrelationsfunktionen -------------------------- ##
+    lag = n//10
+    cov_x = discrete_autocovariance(neigung_x_interp_detrend, lag)
+    cov_y = discrete_autocovariance(neigung_y_interp_detrend, lag)
+    cov_t = discrete_autocovariance(temperatur_interp_detrend, lag)
+    acf_x = autocorrelation(neigung_x_interp_detrend, cov_x)
+    acf_y = autocorrelation(neigung_y_interp_detrend, cov_y)
+    acf_t = autocorrelation(temperatur_interp_detrend, cov_t)
+    
+    # plotten der Autokorrelationsfunktionen
+    plt.figure(figsize=(12, 4))
+    plt.subplot(1, 3, 1)
+    plt.plot(acf_x, 'b')
+    plt.setp(plt.gca().lines, linewidth=0.5)
+    plt.title('Autokorrelation Neigung x')
+    plt.xlabel('Lag [s]')
+    plt.ylabel('Autokorrelation')
+    plt.subplot(1, 3, 2)
+    plt.plot(acf_y, 'b')
+    plt.setp(plt.gca().lines, linewidth=0.5)
+    plt.title('Autokorrelation Neigung y')
+    plt.xlabel('Lag [s]')
+    plt.ylabel('Autokorrelation')
+    plt.subplot(1, 3, 3)
+    plt.plot(acf_t, 'b')
+    plt.setp(plt.gca().lines, linewidth=0.5)
+    plt.title('Autokorrelation Temperatur')
+    plt.xlabel('Lag [s]')
+    plt.ylabel('Autokorrelation')   
+    plt.tight_layout()
+    plt.show()
+    
+
     
     
     
