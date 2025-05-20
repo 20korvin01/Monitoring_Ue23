@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.io
-from plots import plot_neigungsdaten, plot_delta_t
+from plots import plot_neigungsdaten, plot_delta_t, plot_autokovarianz, plot_autokorrelation
 import matplotlib.pyplot as plt
 
 def linear_interpolation(timestamps, values, t_new):
@@ -119,29 +119,9 @@ if __name__ == "__main__":
     acf_y = autocorrelation(neigung_y_interp_detrend, cov_y)
     acf_t = autocorrelation(temperatur_interp_detrend, cov_t)
     
-    # plotten der Autokorrelationsfunktionen
-    plt.figure(figsize=(12, 4))
-    plt.subplot(1, 3, 1)
-    plt.plot(acf_x, 'b')
-    plt.setp(plt.gca().lines, linewidth=0.5)
-    plt.title('Autokorrelation Neigung x')
-    plt.xlabel('Lag [s]')
-    plt.ylabel('Autokorrelation')
-    plt.subplot(1, 3, 2)
-    plt.plot(acf_y, 'b')
-    plt.setp(plt.gca().lines, linewidth=0.5)
-    plt.title('Autokorrelation Neigung y')
-    plt.xlabel('Lag [s]')
-    plt.ylabel('Autokorrelation')
-    plt.subplot(1, 3, 3)
-    plt.plot(acf_t, 'b')
-    plt.setp(plt.gca().lines, linewidth=0.5)
-    plt.title('Autokorrelation Temperatur')
-    plt.xlabel('Lag [s]')
-    plt.ylabel('Autokorrelation')   
-    plt.tight_layout()
-    plt.show()
-    
+    ## 2.2 Darstellung der Autokovarianz- und Autokorrelationsfunktionen ------------------------- ##
+    plot_autokovarianz(cov_x, cov_y, cov_t)
+    plot_autokorrelation(acf_x, acf_y, acf_t)
 
     
     

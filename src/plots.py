@@ -63,3 +63,71 @@ def plot_delta_t(timestamps):
     plt.legend()
     plt.tight_layout()
     plt.show()
+    
+    
+def plot_autokovarianz(cov_x, cov_y, cov_t):
+    """
+    Plottet die Autokovarianzen der Neigung x, y und Temperatur
+    in drei separaten Plots neben einander.
+    """
+    time = np.arange(len(cov_x)) * 120 / 3600
+    
+    plt.figure(figsize=(12, 4))
+    
+    # Autokovarianz Neigung x
+    plt.subplot(1, 3, 1)
+    plt.plot(time, cov_x, 'b', marker='o', markersize=0.5, ls="")
+    plt.title('Autokovarianz Neigung x')
+    plt.xlabel('Lag [h]')
+    plt.ylabel('Autokovarianz')
+
+    # Autokovarianz Neigung y
+    plt.subplot(1, 3, 2)
+    plt.plot(time, cov_y, 'b', marker='o', markersize=0.5, ls="")
+    plt.title('Autokovarianz Neigung y')
+    plt.xlabel('Lag [h]')
+    plt.ylabel('Autokovarianz')
+
+    # Autokovarianz Temperatur
+    plt.subplot(1, 3, 3)
+    plt.plot(time, cov_t, 'b', marker='o', markersize=0.5, ls="")
+    plt.title('Autokovarianz Temperatur')
+    plt.xlabel('Lag [h]')
+    plt.ylabel('Autokovarianz')   
+    
+    plt.tight_layout()
+    plt.show()   
+    
+    
+def plot_autokorrelation(acf_x, acf_y, acf_t):
+    """
+    Plottet die Autokorrelationsfunktionen der Neigung x, y und Temperatur
+    in drei separaten Plots neben einander.
+    """
+    time = np.arange(len(acf_x)) * 120 / 3600
+    
+    plt.figure(figsize=(12, 4))
+    
+    # Autokorrelation Neigung x
+    plt.subplot(1, 3, 1)
+    plt.plot(time, acf_x, 'b', marker='o', markersize=0.5, ls="")
+    plt.title('Autokorrelation Neigung x')
+    plt.xlabel('Lag [h]')
+    plt.ylabel('Autokorrelation')
+
+    # Autokorrelation Neigung y
+    plt.subplot(1, 3, 2)
+    plt.plot(time, acf_y, 'b', marker='o', markersize=0.5, ls="")
+    plt.title('Autokorrelation Neigung y')
+    plt.xlabel('Lag [h]')
+    plt.ylabel('Autokorrelation')
+
+    # Autokorrelation Temperatur
+    plt.subplot(1, 3, 3)
+    plt.plot(time, acf_t, 'b', marker='o', markersize=0.5, ls="")
+    plt.title('Autokorrelation Temperatur')
+    plt.xlabel('Lag [h]')
+    plt.ylabel('Autokorrelation')   
+    
+    plt.tight_layout()
+    plt.show()
