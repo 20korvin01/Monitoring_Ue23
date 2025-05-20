@@ -78,21 +78,21 @@ def plot_autokovarianz(cov_x, cov_y, cov_t):
     plt.subplot(1, 3, 1)
     plt.plot(time, cov_x, 'b', marker='o', markersize=0.5, ls="")
     plt.title('Autokovarianz Neigung x')
-    plt.xlabel('Lag [h]')
+    plt.xlabel('Zeitabstand τ in h')
     plt.ylabel('Autokovarianz')
 
     # Autokovarianz Neigung y
     plt.subplot(1, 3, 2)
     plt.plot(time, cov_y, 'b', marker='o', markersize=0.5, ls="")
     plt.title('Autokovarianz Neigung y')
-    plt.xlabel('Lag [h]')
+    plt.xlabel('Zeitabstand τ in h')
     plt.ylabel('Autokovarianz')
 
     # Autokovarianz Temperatur
     plt.subplot(1, 3, 3)
     plt.plot(time, cov_t, 'b', marker='o', markersize=0.5, ls="")
     plt.title('Autokovarianz Temperatur')
-    plt.xlabel('Lag [h]')
+    plt.xlabel('Zeitabstand τ in h')
     plt.ylabel('Autokovarianz')   
     
     plt.tight_layout()
@@ -112,22 +112,90 @@ def plot_autokorrelation(acf_x, acf_y, acf_t):
     plt.subplot(1, 3, 1)
     plt.plot(time, acf_x, 'b', marker='o', markersize=0.5, ls="")
     plt.title('Autokorrelation Neigung x')
-    plt.xlabel('Lag [h]')
-    plt.ylabel('Autokorrelation')
+    plt.xlabel('Zeitabstand τ in h')
+    plt.ylabel('Autokorrelationskoeffizient')
 
     # Autokorrelation Neigung y
     plt.subplot(1, 3, 2)
     plt.plot(time, acf_y, 'b', marker='o', markersize=0.5, ls="")
     plt.title('Autokorrelation Neigung y')
-    plt.xlabel('Lag [h]')
-    plt.ylabel('Autokorrelation')
+    plt.xlabel('Zeitabstand τ in h')
+    plt.ylabel('Autokorrelationskoeffizient')
 
     # Autokorrelation Temperatur
     plt.subplot(1, 3, 3)
     plt.plot(time, acf_t, 'b', marker='o', markersize=0.5, ls="")
     plt.title('Autokorrelation Temperatur')
-    plt.xlabel('Lag [h]')
-    plt.ylabel('Autokorrelation')   
+    plt.xlabel('Zeitabstand τ in h')
+    plt.ylabel('Autokorrelationskoeffizient')   
+    
+    plt.tight_layout()
+    plt.show()
+    
+    
+def plot_kreuzkovarianz(crosscov_xy, crosscov_xt, crosscov_yt):
+    """
+    Plottet die Kreuzkovarianzen der Neigung x, y und Temperatur
+    in drei separaten Plots neben einander.
+    """
+    time = np.arange(len(crosscov_xy)) * 120 / 3600
+    
+    plt.figure(figsize=(12, 4))
+    
+    # Kreuzkovarianz Neigung x und y
+    plt.subplot(1, 3, 1)
+    plt.plot(time, crosscov_xy, 'b', marker='o', markersize=0.5, ls="")
+    plt.title('Kreuzkovarianz Neigung x und y')
+    plt.xlabel('Zeitabstand τ in h')
+    plt.ylabel('Kreuzkovarianz')
+
+    # Kreuzkovarianz Neigung x und Temperatur
+    plt.subplot(1, 3, 2)
+    plt.plot(time, crosscov_xt, 'b', marker='o', markersize=0.5, ls="")
+    plt.title('Kreuzkovarianz Neigung x und Temperatur')
+    plt.xlabel('Zeitabstand τ in h')
+    plt.ylabel('Kreuzkovarianz')
+
+    # Kreuzkovarianz Neigung y und Temperatur
+    plt.subplot(1, 3, 3)
+    plt.plot(time, crosscov_yt, 'b', marker='o', markersize=0.5, ls="")
+    plt.title('Kreuzkovarianz Neigung y und Temperatur')
+    plt.xlabel('Zeitabstand τ in h')
+    plt.ylabel('Kreuzkovarianz')   
+    
+    plt.tight_layout()
+    plt.show()
+    
+    
+def plot_kreuzkorrelation(crosscorr_xy, crosscorr_xt, crosscorr_yt):
+    """
+    Plottet die Kreuzkorrelationsfunktionen der Neigung x, y und Temperatur
+    in drei separaten Plots neben einander.
+    """
+    time = np.arange(len(crosscorr_xy)) * 120 / 3600
+    
+    plt.figure(figsize=(12, 4))
+    
+    # Kreuzkorrelation Neigung x und y
+    plt.subplot(1, 3, 1)
+    plt.plot(time, crosscorr_xy, 'b', marker='o', markersize=0.5, ls="")
+    plt.title('Kreuzkorrelation Neigung x und y')
+    plt.xlabel('Zeitabstand τ in h')
+    plt.ylabel('Kreuzkorrelationskoeffizient')
+
+    # Kreuzkorrelation Neigung x und Temperatur
+    plt.subplot(1, 3, 2)
+    plt.plot(time, crosscorr_xt, 'b', marker='o', markersize=0.5, ls="")
+    plt.title('Kreuzkorrelation Neigung x und Temperatur')
+    plt.xlabel('Zeitabstand τ in h')
+    plt.ylabel('Kreuzkorrelationskoeffizient')
+
+    # Kreuzkorrelation Neigung y und Temperatur
+    plt.subplot(1, 3, 3)
+    plt.plot(time, crosscorr_yt, 'b', marker='o', markersize=0.5, ls="")
+    plt.title('Kreuzkorrelation Neigung y und Temperatur')
+    plt.xlabel('Zeitabstand τ in h')
+    plt.ylabel('Kreuzkorrelationskoeffizient')   
     
     plt.tight_layout()
     plt.show()

@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.io
-from plots import plot_neigungsdaten, plot_delta_t, plot_autokovarianz, plot_autokorrelation
+from plots import plot_neigungsdaten, plot_delta_t, plot_autokovarianz, plot_autokorrelation, plot_kreuzkovarianz, plot_kreuzkorrelation
 import matplotlib.pyplot as plt
 
 def linear_interpolation(timestamps, values, t_new):
@@ -40,7 +40,7 @@ def linear_regression(t, y):
     return y_trend
 
 
-def discrete_autocovariance(x, lag):
+def autocovariance(x, lag):
     """
     Berechnet die diskrete Autokovarianz der Zeitreihe x mit dem angegebenen Lag (k)
     """
@@ -58,12 +58,33 @@ def autocorrelation(x, cov_x):
     var_x = np.var(x)
     acf = cov_x / var_x
     return acf
-    
+
+
+def crosscovariance(x, y, lag):
+    """
+    Berechnet die diskrete Kreuzkovarianz der Zeitreihen x und y mit dem angegebenen Lag (k)
+    """
+    n = len(x)
+    mean_x = np.mean(x)
+    mean_y = np.mean(y)
+    cov_xy = np.zeros(lag)
+    for k in range(lag):
+        cov_xy[k] = np.sum((x[:n-k] - mean_x) * (y[k:] - mean_y)) / (n - k - 1)
+    return cov_xy
+
+def crosscorrelation(x, y, crosscov_xy):
+    """
+    Berechnet die Kreuzkorrelation der Zeitreihen x und y
+    """
+    var_x = np.var(x)
+    var_y = np.var(y)
+    crosscorr = crosscov_xy / np.sqrt(var_x * var_y)
+    return crosscorr
 
 
 if __name__ == "__main__":   
     
-    ### AUFGABE 0 #####################################################################################
+    ### AUFGABE 0 ####################################################################################
     """Laden und Darstellen der Messwerte"""
     # Laden der Messwerte
     mat_contents = scipy.io.loadmat('data/Neigung.mat')
@@ -78,13 +99,13 @@ if __name__ == "__main__":
     # plot_neigungsdaten(neigung_zeitreihe)
        
     
-    ### AUFGABE 1 #####################################################################################
+    ### AUFGABE 1 ####################################################################################
     """Aufbereitung der Messwerte"""
-    ## 1.1 Anschauliche Darstellung der Datenlücken ------------------------------------------------ ##
+    ## 1.1 Anschauliche Darstellung der Datenlücken ----------------------------------------------- ##
     # --> dazu Berechnen der Differenzen der Zeitstempel (dort wo Differenz > 120s)
     # plot_delta_t(neigung_zeitreihe[:, 3])
     
-    ## 1.2 Füllen der Datenlücken durch lineare Interpolation -------------------------------------- ##
+    ## 1.2 Füllen der Datenlücken durch lineare Interpolation ------------------------------------- ##
     # Abtastintervall
     dT = 120
     # Start- und Endzeit
@@ -97,7 +118,7 @@ if __name__ == "__main__":
     neigung_y_interp = linear_interpolation(t, neigung_y, t_new)
     temperatur_interp = linear_interpolation(t, temperatur, t_new)
     
-    ## 1.3 Beseitigung vorhandener (linearer) Trends ---------------------------------------------- ##
+    ## 1.3 Beseitigung vorhandener (linearer) Trends --------------------------------------------- ##
     # Berechnung der linearen Regression (y = mx + b)
     neigung_x_trend = linear_regression(t_new, neigung_x_interp)
     neigung_y_trend = linear_regression(t_new, neigung_y_interp)
@@ -112,16 +133,49 @@ if __name__ == "__main__":
     """Autokovarianz"""
     ## 2.1 Berechnung der Autokovarianz- und Autokorrelationsfunktionen -------------------------- ##
     lag = n//10
-    cov_x = discrete_autocovariance(neigung_x_interp_detrend, lag)
-    cov_y = discrete_autocovariance(neigung_y_interp_detrend, lag)
-    cov_t = discrete_autocovariance(temperatur_interp_detrend, lag)
+    cov_x = autocovariance(neigung_x_interp_detrend, lag)
+    cov_y = autocovariance(neigung_y_interp_detrend, lag)
+    cov_t = autocovariance(temperatur_interp_detrend, lag)
     acf_x = autocorrelation(neigung_x_interp_detrend, cov_x)
     acf_y = autocorrelation(neigung_y_interp_detrend, cov_y)
     acf_t = autocorrelation(temperatur_interp_detrend, cov_t)
     
     ## 2.2 Darstellung der Autokovarianz- und Autokorrelationsfunktionen ------------------------- ##
-    plot_autokovarianz(cov_x, cov_y, cov_t)
-    plot_autokorrelation(acf_x, acf_y, acf_t)
+    # plot_autokovarianz(cov_x, cov_y, cov_t)
+    # plot_autokorrelation(acf_x, acf_y, acf_t)
+    
+    ## 2.3 Interpretation der Verläufe der Autokorrelationsfunktionen ---------------------------- ##
+    
+    ## 2.4 Interpretation der Stellen C(0), C(1) und C(τ>1) der Autokovarianz -------------------- ##
+    
+    ## 2.5 Gauß-Markov-Prozess, weißes Rauschen oder farbiges Rauschen? -------------------------- ##
+    
+    
+    ### AUFGABE 3 ###################################################################################
+    """Kreuzkovarianz"""
+    ## 3.1 Berechnung der drei Kombinationen der Kreuzkovarianz und -korrelationsfunktionen ------ ##
+    lag = n//10
+    crosscov_xy = crosscovariance(neigung_x_interp_detrend, neigung_y_interp_detrend, lag)
+    crosscov_xt = crosscovariance(neigung_x_interp_detrend, temperatur_interp_detrend, lag)
+    crosscov_yt = crosscovariance(neigung_y_interp_detrend, temperatur_interp_detrend, lag)
+    crosscorr_xy = crosscorrelation(neigung_x_interp_detrend, neigung_y_interp_detrend, crosscov_xy)
+    crosscorr_xt = crosscorrelation(neigung_x_interp_detrend, temperatur_interp_detrend, crosscov_xt)
+    crosscorr_yt = crosscorrelation(neigung_y_interp_detrend, temperatur_interp_detrend, crosscov_yt)
+    
+    ## 3.2 Darstellung der Kreuzkovarianz- und -korrelationsfunktionen --------------------------- ##
+    # plot_kreuzkovarianz(crosscov_xy, crosscov_xt, crosscov_yt)
+    # plot_kreuzkorrelation(crosscorr_xy, crosscorr_xt, crosscorr_yt)
+    
+    ## 3.3 Interpretation der Verläufe der Kreuzkorrelationsfunktionen --------------------------- ##
+    
+    
+    ## AUFGABE 4 ####################################################################################
+    """Spektralanalyse"""
+    ## 4.1 Berechnung der Leistungs- und Amplitudenspektren -------------------------------------- ##
+    
+    ## 4.2 Interpretation der Spektren ----------------------------------------------------------- ##
+    
+    ## 4.3 Vergleich eigener Ergebnisse mit Ergebnissen der fft-Funktion aus dem Modul scipy ----- ##
 
     
     
