@@ -45,23 +45,11 @@ def plot_delta_t(timestamps):
     In rot: delta_t > 120s
     In grün: delta_t < 120s
     """
-    blau = []
-    rot = []
-    gruen = []
+    delta_t = np.diff(timestamps)
     
-    for i in range(0, len(timestamps)-1):
-        delta_t = timestamps[i+1] - timestamps[i]
-        if delta_t == 120:
-            blau.append([timestamps[i], delta_t])
-        elif delta_t > 120:
-            rot.append([timestamps[i], delta_t])
-        elif delta_t < 120:
-            gruen.append([timestamps[i], delta_t])
-            
-    # array
-    blau = np.array(blau)
-    rot = np.array(rot)
-    gruen = np.array(gruen)
+    blau = np.array([timestamps[:-1][delta_t == 120], delta_t[delta_t == 120]]).T
+    rot = np.array([timestamps[:-1][delta_t > 120], delta_t[delta_t > 120]]).T
+    gruen = np.array([timestamps[:-1][delta_t < 120], delta_t[delta_t < 120]]).T
     
     # plot
     plt.figure(figsize=(12, 4))
