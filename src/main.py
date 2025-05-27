@@ -1,7 +1,9 @@
 import numpy as np
 import scipy.io
-from plots import plot_neigungsdaten, plot_delta_t, plot_autokovarianz, plot_autokorrelation, plot_kreuzkovarianz, plot_kreuzkorrelation
 import matplotlib.pyplot as plt
+
+from src.plots import plot_neigungsdaten, plot_delta_t, plot_autokovarianz, plot_autokorrelation, plot_kreuzkovarianz, plot_kreuzkorrelation
+
 
 def linear_interpolation(timestamps, values, t_new):
     """
@@ -80,6 +82,35 @@ def crosscorrelation(x, y, crosscov_xy):
     var_y = np.var(y)
     crosscorr = crosscov_xy / np.sqrt(var_x * var_y)
     return crosscorr
+
+def dft(time_signal):
+    n = len(time_signal)
+    X = []
+
+    for k in range(n):
+        X_k = 0
+
+        for i in range(n):
+            e = np.exp(2j * np.pi *k * i/n)
+            X_k += time_signal[i]/e
+        X.append(X_k)
+    return np.array(X)
+
+def leistungsdichtespektrum(m,dt,acf):
+    fn = 0.5*dt # Nyquist-Frequenz
+    temp = np.zeros(m)
+    tau_max = m * dt  # Datenausschnitt, für welchen die acf vorliegt -> Zeitreihenlänge in s
+    dve = 1/tau_max # spektrale Fensterbreite bzw. Schrittweite der Frequenzachse
+    D = np.ones(m)
+    lds = np.zeros(m)
+    # for tau in range(0,tau_max):
+        # D = np.zeros((m, 1))
+        # D[tau:m+1+tau] = 1
+    for k in range(0,m):
+        for j in range(1,m-1):
+            temp[j-1] = D[j] * acf[j] * np.cos(np.pi * k * j/m)
+        lds[k] = 4*dt*(0.5*(acf[0]+(-1)**k *D[m-1]*acf[m-1]) + sum(temp))
+    return lds
 
 
 if __name__ == "__main__":   
@@ -172,11 +203,12 @@ if __name__ == "__main__":
     ## AUFGABE 4 ####################################################################################
     """Spektralanalyse"""
     ## 4.1 Berechnung der Leistungs- und Amplitudenspektren -------------------------------------- ##
-    
+    # Folie 36 aus Zeitreihenanalyse Teil 2
+    lds = leistungsdichtespektrum(lag,dT,acf_x)
+    test = dft(acf_x)
+    plt.plot(lds)
+    plt.show()
     ## 4.2 Interpretation der Spektren ----------------------------------------------------------- ##
     
     ## 4.3 Vergleich eigener Ergebnisse mit Ergebnissen der fft-Funktion aus dem Modul scipy ----- ##
 
-    
-    
-    
