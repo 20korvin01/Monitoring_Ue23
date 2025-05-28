@@ -112,13 +112,16 @@ def leistungsdichtespektrum(m,dt,acf):
         lds[k] = 4*dt*(0.5*(acf[0]+(-1)**k *D[m-1]*acf[m-1]) + sum(temp))
     return lds
 
+def amplitudenspektrum(m, dt, lds):
+    A_k = np.sqrt(lds/(m*dt))
+    return A_k
 
 if __name__ == "__main__":   
     
     ### AUFGABE 0 ####################################################################################
     """Laden und Darstellen der Messwerte"""
     # Laden der Messwerte
-    mat_contents = scipy.io.loadmat('data/Neigung.mat')
+    mat_contents = scipy.io.loadmat('../data/Neigung.mat')
     # Neigung-x, Neigung-y, Temperatur, Zeit in s || Abtastinterval: 120s
     neigung_zeitreihe = np.array(mat_contents['N'])
     neigung_x = neigung_zeitreihe[:, 0]
@@ -158,8 +161,8 @@ if __name__ == "__main__":
     neigung_x_interp_detrend = neigung_x_interp - neigung_x_trend + neigung_x_trend[0]
     neigung_y_interp_detrend = neigung_y_interp - neigung_y_trend + neigung_y_trend[0]
     temperatur_interp_detrend = temperatur_interp - temperatur_trend + temperatur_trend[0]
-    
-    
+
+
     ### AUFGABE 2 ###################################################################################
     """Autokovarianz"""
     ## 2.1 Berechnung der Autokovarianz- und Autokorrelationsfunktionen -------------------------- ##
@@ -204,10 +207,20 @@ if __name__ == "__main__":
     """Spektralanalyse"""
     ## 4.1 Berechnung der Leistungs- und Amplitudenspektren -------------------------------------- ##
     # Folie 36 aus Zeitreihenanalyse Teil 2
-    lds = leistungsdichtespektrum(lag,dT,acf_x)
+    lds_x = leistungsdichtespektrum(lag,dT,acf_x)
+    lds_y = leistungsdichtespektrum(lag,dT,acf_y)
+    lds_t = leistungsdichtespektrum(lag,dT,acf_t)
     test = dft(acf_x)
-    plt.plot(lds)
+    plt.plot(lds_x)
     plt.show()
+
+    ampl_spektrum_x = amplitudenspektrum(lag, dT, lds_x)
+    ampl_spektrum_y = amplitudenspektrum(lag, dT, lds_y)
+    ampl_spektrum_t = amplitudenspektrum(lag, dT, lds_t)
+
+    plt.plot(ampl_spektrum_x)
+    plt.show()
+
     ## 4.2 Interpretation der Spektren ----------------------------------------------------------- ##
     
     ## 4.3 Vergleich eigener Ergebnisse mit Ergebnissen der fft-Funktion aus dem Modul scipy ----- ##
