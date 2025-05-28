@@ -121,7 +121,7 @@ if __name__ == "__main__":
     ### AUFGABE 0 ####################################################################################
     """Laden und Darstellen der Messwerte"""
     # Laden der Messwerte
-    mat_contents = scipy.io.loadmat('../data/Neigung.mat')
+    mat_contents = scipy.io.loadmat('data/Neigung.mat')
     # Neigung-x, Neigung-y, Temperatur, Zeit in s || Abtastinterval: 120s
     neigung_zeitreihe = np.array(mat_contents['N'])
     neigung_x = neigung_zeitreihe[:, 0]
@@ -209,14 +209,12 @@ if __name__ == "__main__":
     # Folie 36 aus Zeitreihenanalyse Teil 2
     lds_x = leistungsdichtespektrum(lag,dT,acf_x)
     lds_y = leistungsdichtespektrum(lag,dT,acf_y)
-    lds_t = leistungsdichtespektrum(lag,dT,acf_t)
     test = dft(acf_x)
     plt.plot(lds_x)
     plt.show()
 
     ampl_spektrum_x = amplitudenspektrum(lag, dT, lds_x)
     ampl_spektrum_y = amplitudenspektrum(lag, dT, lds_y)
-    ampl_spektrum_t = amplitudenspektrum(lag, dT, lds_t)
 
     plt.plot(ampl_spektrum_x)
     plt.show()
