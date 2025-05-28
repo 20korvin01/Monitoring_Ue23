@@ -97,12 +97,13 @@ def dft(time_signal):
     return np.array(X)
 
 def leistungsdichtespektrum(m,dt,acf):
-    fn = 0.5*dt # Nyquist-Frequenz
-    temp = np.zeros(m)
-    tau_max = m * dt  # Datenausschnitt, für welchen die acf vorliegt -> Zeitreihenlänge in s
-    dve = 1/tau_max # spektrale Fensterbreite bzw. Schrittweite der Frequenzachse
+
+    tau_max = m*dt  # Datenausschnitt, für welchen die acf vorliegt -> Zeitreihenlänge eines Tages in s
+    dve = 1 / tau_max  # spektrale Fensterbreite bzw. Schrittweite der Frequenzachse
+    temp = np.zeros(m) # sammelt Beiträge der Frequenz f_k
     D = np.ones(m)
     lds = np.zeros(m)
+
     # for tau in range(0,tau_max):
         # D = np.zeros((m, 1))
         # D[tau:m+1+tau] = 1
@@ -166,7 +167,7 @@ if __name__ == "__main__":
     ### AUFGABE 2 ###################################################################################
     """Autokovarianz"""
     ## 2.1 Berechnung der Autokovarianz- und Autokorrelationsfunktionen -------------------------- ##
-    lag = n//10
+    lag = n//10 - 3 # n=7080 Datapoints bei dt=120s = 10 Tage und 1h Aufnahmedauer -> 10d+1h /10 = 1d + 6min => 6min = 120s * 3 Aufnahmen
     cov_x = autocovariance(neigung_x_interp_detrend, lag)
     cov_y = autocovariance(neigung_y_interp_detrend, lag)
     cov_t = autocovariance(temperatur_interp_detrend, lag)
@@ -188,7 +189,7 @@ if __name__ == "__main__":
     ### AUFGABE 3 ###################################################################################
     """Kreuzkovarianz"""
     ## 3.1 Berechnung der drei Kombinationen der Kreuzkovarianz und -korrelationsfunktionen ------ ##
-    lag = n//10
+    lag = n//10 -3
     crosscov_xy = crosscovariance(neigung_x_interp_detrend, neigung_y_interp_detrend, lag)
     crosscov_xt = crosscovariance(neigung_x_interp_detrend, temperatur_interp_detrend, lag)
     crosscov_yt = crosscovariance(neigung_y_interp_detrend, temperatur_interp_detrend, lag)
@@ -207,19 +208,25 @@ if __name__ == "__main__":
     """Spektralanalyse"""
     ## 4.1 Berechnung der Leistungs- und Amplitudenspektren -------------------------------------- ##
     # Folie 36 aus Zeitreihenanalyse Teil 2
+    fn = 0.5 * 1/dT  # Nyquist-Frequenz
+    tau_max = lag*dT  # Datenausschnitt, für welchen die acf vorliegt -> Zeitreihenlänge eines Tages in s
+    dve = 1 / tau_max  # spektrale Fensterbreite bzw. Schrittweite der Frequenzachse
+
+
     lds_x = leistungsdichtespektrum(lag,dT,acf_x)
     lds_y = leistungsdichtespektrum(lag,dT,acf_y)
     test = dft(acf_x)
-    plt.plot(lds_x)
+    plt.plot(np.arange(0,lag)*dve,lds_x)
     plt.show()
-
-    ampl_spektrum_x = amplitudenspektrum(lag, dT, lds_x)
-    ampl_spektrum_y = amplitudenspektrum(lag, dT, lds_y)
-
-    plt.plot(ampl_spektrum_x)
-    plt.show()
+    #
+    # ampl_spektrum_x = amplitudenspektrum(lag, dT, lds_x)
+    # ampl_spektrum_y = amplitudenspektrum(lag, dT, lds_y)
+    #
+    # plt.plot(ampl_spektrum_x)
+    # plt.show()
 
     ## 4.2 Interpretation der Spektren ----------------------------------------------------------- ##
     
     ## 4.3 Vergleich eigener Ergebnisse mit Ergebnissen der fft-Funktion aus dem Modul scipy ----- ##
 
+    print('.')
