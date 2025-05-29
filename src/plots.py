@@ -7,8 +7,9 @@ def plot_neigungsdaten(neigung_zeitreihe):
     Plottet die x-, y- und Temperaturdaten der Neigung
     in drei separaten Plots neben einander.
     """
-                               # / 60s*60min 
-    time = neigung_zeitreihe[:,3]/3600
+    # / 60s*60min # / 24h
+    # Zeit in Tagen
+    time = neigung_zeitreihe[:,3]/3600/24
 
     plt.figure(figsize=(12, 4))
     
@@ -17,7 +18,7 @@ def plot_neigungsdaten(neigung_zeitreihe):
     plt.plot(time,neigung_zeitreihe[:, 0], 'b')
     plt.setp(plt.gca().lines, linewidth=0.5)
     plt.title('Neigung x')
-    plt.xlabel('t in h')
+    plt.xlabel('t in Tagen')
     plt.ylabel('Neigung x-Richtung in °')
 
     # Neigung y
@@ -25,7 +26,7 @@ def plot_neigungsdaten(neigung_zeitreihe):
     plt.plot(time,neigung_zeitreihe[:, 1], 'b')
     plt.setp(plt.gca().lines, linewidth=0.5)
     plt.title('Neigung y')
-    plt.xlabel('t in h')
+    plt.xlabel('t in Tagen')
     plt.ylabel('Neigung y-Richtung in °')
 
     # Temperatur
@@ -33,7 +34,7 @@ def plot_neigungsdaten(neigung_zeitreihe):
     plt.plot(time,neigung_zeitreihe[:, 2], 'b')
     plt.setp(plt.gca().lines, linewidth=0.5)
     plt.title('Temperatur')
-    plt.xlabel('t in h')
+    plt.xlabel('t in Tagen')
     plt.ylabel('Temperatur in °C')
 
     plt.tight_layout()

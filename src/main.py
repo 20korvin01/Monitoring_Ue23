@@ -2,7 +2,7 @@ import numpy as np
 import scipy.io
 import matplotlib.pyplot as plt
 
-from src.plots import plot_neigungsdaten, plot_delta_t, plot_autokovarianz, plot_autokorrelation, plot_kreuzkovarianz, plot_kreuzkorrelation
+from plots import plot_neigungsdaten, plot_delta_t, plot_autokovarianz, plot_autokorrelation, plot_kreuzkovarianz, plot_kreuzkorrelation
 
 
 def linear_interpolation(timestamps, values, t_new):
@@ -132,6 +132,8 @@ if __name__ == "__main__":
     n = len(t)
     # Plotten der Messwerte
     plot_neigungsdaten(neigung_zeitreihe)
+    
+    
        
     
     ### AUFGABE 1 ####################################################################################
