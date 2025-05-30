@@ -1,8 +1,9 @@
 import numpy as np
 import scipy.io
 import matplotlib.pyplot as plt
+import scipy.fft
 
-from plots import plot_neigungsdaten, plot_delta_t, plot_autokovarianz, plot_autokorrelation, plot_kreuzkovarianz, plot_kreuzkorrelation
+from plots import plot_neigungsdaten, plot_delta_t, plot_autokovarianz, plot_autokorrelation, plot_kreuzkovarianz, plot_kreuzkorrelation, plot_leistungsdichtespektrum
 
 
 def linear_interpolation(timestamps, values, t_new):
@@ -112,11 +113,11 @@ def leistungsdichtespektrum(acf, dt):
         for j in range(1, m - 1):
             summe += acf[j] * np.cos(np.pi * k * j / m)
 
-        lds[k] = 4 * dt * (
-            0.5 * acf[0] +
-            0.5 * (-1)**k * acf[m - 1] +
-            summe
-        )
+        lds[k] = 2 * dt * (
+            acf[0] +
+            (-1)**k * acf[m - 1] +
+            2*summe
+        ) # statt 4*(0.5*acf +0.5*acf +summe) jetzt 2*(acf +acf +2*summe) => spart eine Multiplikation, wenn schon keine inneren Klammern verwendet werden
     return lds
 
 def amplitudenspektrum(lds, dt):
@@ -223,34 +224,51 @@ if __name__ == "__main__":
     ## 4.1 Berechnung der Leistungs- und Amplitudenspektren -------------------------------------- ##
     # Daten berechnen
     m = len(acf_y)  # Anzahl der Lags
-    lds = leistungsdichtespektrum(acf_y, dT)
-    lds = abs(lds)  # Absolutwert, um negative Werte zu vermeiden
-    np.savetxt('data/leistungsdichtespektrum.txt', lds)
+    lds_y = abs(leistungsdichtespektrum(acf_y, dT))# Absolutwert, um negative Werte zu vermeiden
+    lds_x = abs(leistungsdichtespektrum(acf_x, dT))
+    np.savetxt('data/leistungsdichtespektrum_x.txt', lds_x)
+    np.savetxt('data/leistungsdichtespektrum_y.txt', lds_y)
     
-    amp = amplitudenspektrum(lds, dT)
+    amp_x = amplitudenspektrum(lds_x, dT)
+    amp_y= amplitudenspektrum(lds_y, dT)
     # Frequenzachse
     freqs = np.arange(m) / (2 * m * dT)
+    plot_leistungsdichtespektrum(freqs,lds_x,lds_y,amp_x,amp_y)
 
-    # Plot
-    plt.figure(figsize=(12, 6))
-    plt.subplot(2, 1, 1)
-    plt.plot(freqs, lds)
-    plt.title("Leistungsdichtespektrumsignal")
-    plt.xlabel("Frequenz [Hz]")
-    plt.ylabel("PSD")
-    plt.xlim(0, 1e-4)
-
-
-    plt.subplot(2, 1, 2)
-    plt.plot(freqs, amp)
-    plt.title("Amplitudenspektrumsignal")
-    plt.xlabel("Frequenz [Hz]")
-    plt.ylabel("Amplitude")
-    plt.xlim(0, 1e-4)
-
-    plt.tight_layout()
-    plt.show()
 
     ## 4.2 Interpretation der Spektren ----------------------------------------------------------- ##
     
     ## 4.3 Vergleich eigener Ergebnisse mit Ergebnissen der fft-Funktion aus dem Modul scipy ----- ##
+
+    lds_x_scipy = abs(scipy.fft.fft(acf_x))
+    lds_y_scipy = abs(scipy.fft.fft(acf_y))
+
+    np.savetxt('data/leistungsdichtespektrum_scipy_x.txt', lds_x_scipy)
+    np.savetxt('data/leistungsdichtespektrum_scipy_y.txt', lds_y_scipy)
+
+    amp_x_scipy = amplitudenspektrum(lds_x_scipy, dT)
+    amp_y_scipy = amplitudenspektrum(lds_y_scipy, dT)
+
+    # nicht separat, da anderer Dateiname beim Export gebraucht wird
+    plt.figure(figsize=(10, 8))
+    plt.subplot(2, 1, 1)
+    plt.plot(freqs, lds_x_scipy, 'r', label='x-Richtung')
+    plt.plot(freqs, lds_y_scipy, 'b', label='y-Richtung')
+    plt.title("Leistungsdichtespektrum")
+    plt.xlabel("Frequenz [Hz]")
+    plt.ylabel("PSD")
+    plt.legend()
+    plt.xlim(0, 1e-4)
+    #
+    plt.subplot(2, 1, 2)
+    plt.semilogy(freqs, amp_x_scipy, 'r', label='x-Richtung')
+    plt.semilogy(freqs, amp_y_scipy, 'b', label='y-Richtung')
+    plt.title("Amplitudenspektrum")
+    plt.xlabel("Frequenz [Hz]")
+    plt.ylabel("Amplitude")
+    plt.legend()
+    plt.xlim(0, 1e-4)
+
+    plt.tight_layout()
+    plt.savefig('plots/leistungsdichtespektrum_scipy.png')
+    plt.show()

@@ -213,3 +213,29 @@ def plot_kreuzkorrelation(crosscorr_xy, crosscorr_xt, crosscorr_yt):
     plt.tight_layout()
     plt.savefig('plots/kreuzkorrelation_zeitreihe.png')
     plt.show()
+
+def plot_leistungsdichtespektrum(freqs,lds_x,lds_y,amp_x,amp_y):
+    # Plot
+    plt.figure(figsize=(10, 8))
+    plt.subplot(2, 1, 1)
+    plt.plot(freqs, lds_x,'r',label='x-Richtung')
+    plt.plot(freqs, lds_y,'b',label='y-Richtung')
+    plt.title("Leistungsdichtespektrum")
+    plt.xlabel("Frequenz [Hz]")
+    plt.ylabel("PSD")
+    plt.legend()
+    plt.xlim(0, 1e-4)
+
+    plt.subplot(2, 1, 2)
+    plt.semilogy(freqs, amp_x,'r',label='x-Richtung')
+    plt.semilogy(freqs, amp_y,'b',label='y-Richtung')
+    plt.title("Amplitudenspektrum")
+    plt.xlabel("Frequenz [Hz]")
+    plt.ylabel("Amplitude")
+    plt.legend()
+    plt.xlim(0, 1e-4)
+
+
+    plt.tight_layout()
+    plt.savefig('plots/leistungsdichtespektrum.png')
+    plt.show()
