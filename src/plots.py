@@ -215,6 +215,8 @@ def plot_kreuzkorrelation(crosscorr_xy, crosscorr_xt, crosscorr_yt):
     plt.show()
 
 def plot_leistungsdichtespektrum(freqs,lds_x,lds_y,amp_x,amp_y):
+    fn = freqs[1]*len(freqs)
+    f_lim = freqs[1]+fn/2
     # Plot
     plt.figure(figsize=(10, 8))
     plt.subplot(2, 1, 1)
@@ -224,7 +226,9 @@ def plot_leistungsdichtespektrum(freqs,lds_x,lds_y,amp_x,amp_y):
     plt.xlabel("Frequenz [Hz]")
     plt.ylabel("PSD")
     plt.legend()
-    plt.xlim(0, 1e-4)
+    plt.xlim(0, f_lim)
+    # nur bis zur halben Nyquistfrequenz plotten, da es sich um ein reelles Signal handelt und nur m/2 Werte unabh. sind
+    # +1 Frequenzschritt, damit die höchste Frequenz besser abgelesen werden kann
 
     plt.subplot(2, 1, 2)
     plt.semilogy(freqs, amp_x,'r',label='x-Richtung')
@@ -233,9 +237,32 @@ def plot_leistungsdichtespektrum(freqs,lds_x,lds_y,amp_x,amp_y):
     plt.xlabel("Frequenz [Hz]")
     plt.ylabel("Amplitude")
     plt.legend()
-    plt.xlim(0, 1e-4)
-
+    plt.xlim(0, f_lim)
 
     plt.tight_layout()
     plt.savefig('plots/leistungsdichtespektrum.png')
-    plt.show()
+
+
+    # Plot zoomed
+    plt.figure(figsize=(10, 8))
+    plt.subplot(2, 1, 1)
+    plt.stem(freqs, lds_x, 'r', label='x-Richtung')
+    plt.stem(freqs, lds_y, 'b', label='y-Richtung')
+    plt.title("Leistungsdichtespektrum")
+    plt.xlabel("Frequenz [Hz]")
+    plt.ylabel("PSD")
+    plt.legend()
+    plt.xlim(0, 1e-4)
+
+    plt.subplot(2, 1, 2)
+    plt.stem(freqs, amp_x, 'r', label='x-Richtung')
+    plt.stem(freqs, amp_y, 'b', label='y-Richtung')
+    plt.title("Amplitudenspektrum")
+    plt.yscale('log')
+    plt.xlabel("Frequenz [Hz]")
+    plt.ylabel("Amplitude")
+    plt.legend()
+    plt.xlim(0, 1e-4)
+
+    plt.tight_layout()
+    plt.savefig('plots/LDS_zoomed.png')

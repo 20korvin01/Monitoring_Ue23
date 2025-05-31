@@ -145,16 +145,16 @@ if __name__ == "__main__":
     n = len(t)
     # Plotten der Messwerte
     # plot_neigungsdaten(neigung_zeitreihe)
-    
-    
-       
-    
+
+
+
+
     ### AUFGABE 1 ####################################################################################
     """Aufbereitung der Messwerte"""
     ## 1.1 Anschauliche Darstellung der Datenlücken ----------------------------------------------- ##
     # --> dazu Berechnen der Differenzen der Zeitstempel (dort wo Differenz > 120s)
     # plot_delta_t(neigung_zeitreihe[:, 3])
-    
+
     ## 1.2 Füllen der Datenlücken durch lineare Interpolation ------------------------------------- ##
     # Abtastintervall
     dT = 120
@@ -167,7 +167,7 @@ if __name__ == "__main__":
     neigung_x_interp = linear_interpolation(t, neigung_x, t_new)
     neigung_y_interp = linear_interpolation(t, neigung_y, t_new)
     temperatur_interp = linear_interpolation(t, temperatur, t_new)
-    
+
     ## 1.3 Beseitigung vorhandener (linearer) Trends --------------------------------------------- ##
     # Berechnung der linearen Regression (y = mx + b)
     neigung_x_trend = linear_regression(t_new, neigung_x_interp)
@@ -189,18 +189,18 @@ if __name__ == "__main__":
     acf_x = autocorrelation(neigung_x_interp_detrend, cov_x)
     acf_y = autocorrelation(neigung_y_interp_detrend, cov_y)
     acf_t = autocorrelation(temperatur_interp_detrend, cov_t)
-    
+
     ## 2.2 Darstellung der Autokovarianz- und Autokorrelationsfunktionen ------------------------- ##
     # plot_autokovarianz(cov_x, cov_y, cov_t)
     # plot_autokorrelation(acf_x, acf_y, acf_t)
-    
+
     ## 2.3 Interpretation der Verläufe der Autokorrelationsfunktionen ---------------------------- ##
-    
+
     ## 2.4 Interpretation der Stellen C(0), C(1) und C(τ>1) der Autokovarianz -------------------- ##
-    
+
     ## 2.5 Gauß-Markov-Prozess, weißes Rauschen oder farbiges Rauschen? -------------------------- ##
-    
-    
+
+
     ### AUFGABE 3 ###################################################################################
     """Kreuzkovarianz"""
     ## 3.1 Berechnung der drei Kombinationen der Kreuzkovarianz und -korrelationsfunktionen ------ ##
@@ -211,14 +211,14 @@ if __name__ == "__main__":
     crosscorr_xy = crosscorrelation(neigung_x_interp_detrend, neigung_y_interp_detrend, crosscov_xy)
     crosscorr_xt = crosscorrelation(neigung_x_interp_detrend, temperatur_interp_detrend, crosscov_xt)
     crosscorr_yt = crosscorrelation(neigung_y_interp_detrend, temperatur_interp_detrend, crosscov_yt)
-    
+
     ## 3.2 Darstellung der Kreuzkovarianz- und -korrelationsfunktionen --------------------------- ##
     # plot_kreuzkovarianz(crosscov_xy, crosscov_xt, crosscov_yt)
     # plot_kreuzkorrelation(crosscorr_xy, crosscorr_xt, crosscorr_yt)
-    
+
     ## 3.3 Interpretation der Verläufe der Kreuzkorrelationsfunktionen --------------------------- ##
-    
-    
+
+
     ## AUFGABE 4 ####################################################################################
     """Spektralanalyse"""
     ## 4.1 Berechnung der Leistungs- und Amplitudenspektren -------------------------------------- ##
@@ -228,16 +228,18 @@ if __name__ == "__main__":
     lds_x = abs(leistungsdichtespektrum(acf_x, dT))
     np.savetxt('data/leistungsdichtespektrum_x.txt', lds_x)
     np.savetxt('data/leistungsdichtespektrum_y.txt', lds_y)
-    
+
     amp_x = amplitudenspektrum(lds_x, dT)
     amp_y= amplitudenspektrum(lds_y, dT)
     # Frequenzachse
     freqs = np.arange(m) / (2 * m * dT)
+    fn = 1/(2*dT)
+    f_lim = freqs[1]+fn/2
     plot_leistungsdichtespektrum(freqs,lds_x,lds_y,amp_x,amp_y)
 
 
     ## 4.2 Interpretation der Spektren ----------------------------------------------------------- ##
-    
+
     ## 4.3 Vergleich eigener Ergebnisse mit Ergebnissen der fft-Funktion aus dem Modul scipy ----- ##
 
     lds_x_scipy = abs(scipy.fft.fft(acf_x))
@@ -258,7 +260,7 @@ if __name__ == "__main__":
     plt.xlabel("Frequenz [Hz]")
     plt.ylabel("PSD")
     plt.legend()
-    plt.xlim(0, 1e-4)
+    plt.xlim(0, f_lim) # nur bis zur halben Nyquistfrequenz plotten, da es sich um ein reelles Signal handelt und nur m/2 Werte unabh. sind
     #
     plt.subplot(2, 1, 2)
     plt.semilogy(freqs, amp_x_scipy, 'r', label='x-Richtung')
@@ -267,7 +269,7 @@ if __name__ == "__main__":
     plt.xlabel("Frequenz [Hz]")
     plt.ylabel("Amplitude")
     plt.legend()
-    plt.xlim(0, 1e-4)
+    plt.xlim(0, f_lim)
 
     plt.tight_layout()
     plt.savefig('plots/leistungsdichtespektrum_scipy.png')
