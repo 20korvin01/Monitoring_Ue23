@@ -1,8 +1,9 @@
 import numpy as np
 import scipy.io
 import matplotlib.pyplot as plt
+import sys
 
-from src.plots import plot_neigungsdaten, plot_delta_t, plot_autokovarianz, plot_autokorrelation, plot_kreuzkovarianz, plot_kreuzkorrelation
+from plots import plot_neigungsdaten, plot_delta_t, plot_autokovarianz, plot_autokorrelation, plot_kreuzkovarianz, plot_kreuzkorrelation
 
 
 def linear_interpolation(timestamps, values, t_new):
@@ -11,6 +12,7 @@ def linear_interpolation(timestamps, values, t_new):
     t_new mithilfe der linearen Interpolation.
     """
     values_interp = np.zeros(len(t_new))
+    is_interp = np.zeros(len(t_new))
     for i in range(len(t_new)):
         # Finde den Index des nächsten Zeitstempels
         idx = np.searchsorted(timestamps, t_new[i])
@@ -24,6 +26,7 @@ def linear_interpolation(timestamps, values, t_new):
             v1 = values[idx - 1]
             v2 = values[idx]
             values_interp[i] = v1 + (v2 - v1) * (t_new[i] - t1) / (t2 - t1)
+            is_interp[i] = 1  # Markiere, dass dieser Wert interpoliert wurde
             
     return values_interp
 
@@ -121,13 +124,15 @@ if __name__ == "__main__":
     mat_contents = scipy.io.loadmat('data/Neigung.mat')
     # Neigung-x, Neigung-y, Temperatur, Zeit in s || Abtastinterval: 120s
     neigung_zeitreihe = np.array(mat_contents['N'])
+    #print(neigung_zeitreihe.shape)
     neigung_x = neigung_zeitreihe[:, 0]
     neigung_y = neigung_zeitreihe[:, 1]
     temperatur = neigung_zeitreihe[:, 2]
     t = neigung_zeitreihe[:, 3]
     n = len(t)
+    print(f"Anzahl Messungen: {n}")
     # Plotten der Messwerte
-    plot_neigungsdaten(neigung_zeitreihe)
+    #plot_neigungsdaten(neigung_zeitreihe)
        
     
     ### AUFGABE 1 ####################################################################################
@@ -135,7 +140,66 @@ if __name__ == "__main__":
     ## 1.1 Anschauliche Darstellung der Datenlücken ----------------------------------------------- ##
     # --> dazu Berechnen der Differenzen der Zeitstempel (dort wo Differenz > 120s)
     plot_delta_t(neigung_zeitreihe[:, 3])
-    
+    t_soll = np.arange(t[0], t[-1], 120)  # Soll-Zeitreihe
+    print(f"Anzahl der Soll-Zeitstempel: {len(t_soll)}")
+    luecken = []
+    neigung_x_ol = []
+    neigung_y_ol = []
+    temperatur_ol = []
+    t_ol = []
+    neigung_x_ft = []
+    neigung_y_ft = []
+    temperatur_ft = []
+    t_ft = []
+    for i in t_soll:
+        if i not in t:
+            #print(f"Zeitstempel {i} fehlt in den Messdaten.")
+            luecken.append(i)
+        else:
+            neigung_x_ol.append(neigung_x[t == i][0])
+            neigung_y_ol.append(neigung_y[t == i][0])
+            temperatur_ol.append(temperatur[t == i][0])
+            t_ol.append(i)
+        if t[(t>i)&(t<i+120)].size > 0:
+            neigung_x_ft.append(neigung_x[t == t[(t>i) & (t<i+120)]])
+            neigung_y_ft.append(neigung_y[t == t[(t>i) & (t<i+120)][0]][0])
+            temperatur_ft.append(temperatur[t == t[(t>i) & (t<i+120)]])
+            t_ft.append(t[(t>i) & (t<i+120)])
+    print(f"Anzahl der Messungen zu Zeitpunkten k*120s: {len(t_ol)}")
+    print(f"Anzahl der fehlenden Messungen zu Zeitpunkten k*120s: {len(luecken)}")
+    print(f"Anzahl der Messungen zu Zeitpunkt != k*120s: {len(t_ft)}")
+    #[array([[ -0.27  ,  -0.6804,  26.02  , 120.    ]]), array([[ -0.27  ,  -0.6805,  26.02  , 240.    ]]), array([[-2.700e-01, -6.806e-01,  2.602e+01,  3.600e+02]]), array([[-2.700e-01, -6.806e-01,  2.602e+01,  4.800e+02]]), array([[-2.701e-01, -6.804e-01,  2.603e+01,  6.000e+02]])]
+
+    plt.figure(figsize=(12, 8))
+    plt.subplot(3, 1, 1)
+    plt.plot(np.multiply(t_ol, 1/(60*60*24)), neigung_x_ol, 'xg', markersize=2, label='Korrekte Messung, t = k*120s')
+    plt.plot(np.multiply(t_ft, 1/(60*60*24)), neigung_x_ft, '.b', markersize=1, label='Falscher Zeitpunkt, t != k*120s')
+    plt.vlines(np.multiply(luecken, 1/(60*60*24)), ymin=np.mean(neigung_x_ol)-0.0005, ymax=np.mean(neigung_x_ol)+0.0005, color='r', linewidth=0.1, label='Fehlende Messung')
+    plt.ylabel('Neigung in x-Richtung in °')
+    plt.xlim(t[0]/(60*60*24), t[-1]/(60*60*24))
+    plt.legend(loc='upper left', bbox_to_anchor=(0, 1.4))
+
+    plt.subplot(3, 1, 2)
+    plt.plot(np.multiply(t_ol, 1/(60*60*24)), neigung_y_ol, 'xg', markersize=2, label='Korrekte Messung, t = k*120s')
+    plt.plot(np.multiply(t_ft, 1/(60*60*24)), neigung_y_ft, '.b', markersize=1, label='Falscher Zeitpunkt, t != k*120s')
+    plt.vlines(np.multiply(luecken, 1/(60*60*24)), ymin=np.mean(neigung_y_ol)-0.0003, ymax=np.mean(neigung_y_ol)+0.0003, color='r', linewidth=0.1, label='Fehlende Messung')
+    plt.ylabel('Neigung in y-Richtung in °')
+    plt.xlim(t[0]/(60*60*24), t[-1]/(60*60*24))
+
+    plt.subplot(3, 1, 3)
+    plt.plot(np.multiply(t_ol, 1/(60*60*24)), temperatur_ol, 'xg', markersize=2, label='Korrekte Messung, t = k*120s')
+    plt.plot(np.multiply(t_ft, 1/(60*60*24)), temperatur_ft, '.b', markersize=1, label='Falscher Zeitpunkt, t != k*120s')
+    plt.vlines(np.multiply(luecken, 1/(60*60*24)), ymin=np.mean(temperatur_ol)-0.07, ymax=np.mean(temperatur_ol)+0.07, color='r', linewidth=0.1, label='Fehlende Messung')
+    plt.xlabel('t in Tagen')
+    plt.ylabel('Temperatur in °C')
+    plt.xlim(t[0]/(60*60*24), t[-1]/(60*60*24))
+
+    plt.tight_layout()
+    plt.suptitle('Messdaten mit Lücken', fontsize=16)
+    plt.subplots_adjust(top=0.9)
+    plt.savefig('plots/neigung_x_zeitreihe_luecken.png')
+    #plt.show()
+
     ## 1.2 Füllen der Datenlücken durch lineare Interpolation ------------------------------------- ##
     # Abtastintervall
     dT = 120
@@ -148,6 +212,35 @@ if __name__ == "__main__":
     neigung_x_interp = linear_interpolation(t, neigung_x, t_new)
     neigung_y_interp = linear_interpolation(t, neigung_y, t_new)
     temperatur_interp = linear_interpolation(t, temperatur, t_new)
+
+    # plt.figure(figsize=(12, 4))
+    # # Neigung x
+    # plt.subplot(1, 3, 1)
+    # plt.plot(neigung_x_interp, 'b')
+    # plt.setp(plt.gca().lines, linewidth=0.5)
+    # plt.title('Neigung x interpoliert')
+    # plt.xlabel('t [s]')
+    # plt.ylabel('Neigung x-Richtung [°]')
+
+    # # Neigung y
+    # plt.subplot(1, 3, 2)
+    # plt.plot(neigung_y_interp, 'b')
+    # plt.setp(plt.gca().lines, linewidth=0.5)
+    # plt.title('Neigung y interpoliert')
+    # plt.xlabel('t [s]')
+    # plt.ylabel('Neigung y-Richtung [°]')
+
+    # # Temperatur
+    # plt.subplot(1, 3, 3)
+    # plt.plot(temperatur_interp, 'b')
+    # plt.setp(plt.gca().lines, linewidth=0.5)
+    # plt.title('Temperatur interpoliert')
+    # plt.xlabel('t [s]')
+    # plt.ylabel('Temperatur [°C]')
+
+    # plt.tight_layout()
+    # plt.savefig('plots/neigung_zeitreihe_interp.png')
+    # plt.show()
     
     ## 1.3 Beseitigung vorhandener (linearer) Trends --------------------------------------------- ##
     # Berechnung der linearen Regression (y = mx + b)
@@ -158,7 +251,85 @@ if __name__ == "__main__":
     neigung_x_interp_detrend = neigung_x_interp - neigung_x_trend + neigung_x_trend[0]
     neigung_y_interp_detrend = neigung_y_interp - neigung_y_trend + neigung_y_trend[0]
     temperatur_interp_detrend = temperatur_interp - temperatur_trend + temperatur_trend[0]
-    
+
+    # Interpolierte Daten
+    plt.figure(figsize=(12, 8))
+    plt.subplot(3, 1, 1)
+    plt.plot(np.multiply(t_new, 1/(60*60*24)), neigung_x_interp, '.g', markersize=1)
+    plt.plot(np.multiply(t_new, 1/(60*60*24)), neigung_x_trend, 'r', linewidth=0.5)
+    plt.ylabel('Neigung in x-Richtung in °')
+    plt.xlim(t_new[0]/(60*60*24), t_new[-1]/(60*60*24))
+
+    plt.subplot(3, 1, 2)
+    plt.plot(np.multiply(t_new, 1/(60*60*24)), neigung_y_interp, '.g', markersize=1)
+    plt.plot(np.multiply(t_new, 1/(60*60*24)), neigung_y_trend, 'r', linewidth=0.5)
+    plt.ylabel('Neigung in y-Richtung in °')
+    plt.xlim(t_new[0]/(60*60*24), t_new[-1]/(60*60*24))
+
+    plt.subplot(3, 1, 3)
+    plt.plot(np.multiply(t_new, 1/(60*60*24)), temperatur_interp, '.g', markersize=1)
+    plt.plot(np.multiply(t_new, 1/(60*60*24)), temperatur_trend, 'r', linewidth=0.5)
+    plt.xlabel('t in Tagen')
+    plt.ylabel('Temperatur in °C')
+    plt.xlim(t_new[0]/(60*60*24), t_new[-1]/(60*60*24))
+
+    plt.tight_layout()
+    plt.suptitle('Interpolierte Messdaten', fontsize=16)
+    plt.subplots_adjust(top=0.95)
+    plt.savefig('plots/interpoliert.png')
+
+    # Trendbereinigte Daten
+    plt.figure(figsize=(12, 8))
+    plt.subplot(3, 1, 1)
+    plt.plot(np.multiply(t_new, 1/(60*60*24)), neigung_x_interp_detrend, '.g', markersize=1)
+    plt.ylabel('Neigung in x-Richtung in °')
+    plt.xlim(t_new[0]/(60*60*24), t_new[-1]/(60*60*24))
+
+    plt.subplot(3, 1, 2)
+    plt.plot(np.multiply(t_new, 1/(60*60*24)), neigung_y_interp_detrend, '.g', markersize=1)
+    plt.ylabel('Neigung in y-Richtung in °')
+    plt.xlim(t_new[0]/(60*60*24), t_new[-1]/(60*60*24))
+
+    plt.subplot(3, 1, 3)
+    plt.plot(np.multiply(t_new, 1/(60*60*24)), temperatur_interp_detrend, '.g', markersize=1)
+    plt.xlabel('t in Tagen')
+    plt.ylabel('Temperatur in °C')
+    plt.xlim(t_new[0]/(60*60*24), t_new[-1]/(60*60*24))
+
+    plt.tight_layout()
+    plt.suptitle('Interpolierte und trendbereinigte Messdaten', fontsize=16)
+    plt.subplots_adjust(top=0.95)
+    plt.savefig('plots/detrend.png')
+
+    # plt.figure(figsize=(12, 4))
+    # # Neigung x
+    # plt.subplot(1, 3, 1)
+    # plt.plot(neigung_x_interp_detrend, 'b')
+    # plt.setp(plt.gca().lines, linewidth=0.5)
+    # plt.title('Neigung x interpoliert ohne Trend')
+    # plt.xlabel('t [s]')
+    # plt.ylabel('Neigung x-Richtung [°]')
+
+    # # Neigung y
+    # plt.subplot(1, 3, 2)
+    # plt.plot(neigung_y_interp_detrend, 'b')
+    # plt.setp(plt.gca().lines, linewidth=0.5)
+    # plt.title('Neigung y interpoliert ohne Trend')
+    # plt.xlabel('t [s]')
+    # plt.ylabel('Neigung y-Richtung [°]')
+
+    # # Temperatur
+    # plt.subplot(1, 3, 3)
+    # plt.plot(temperatur_interp_detrend, 'b')
+    # plt.setp(plt.gca().lines, linewidth=0.5)
+    # plt.title('Temperatur interpoliert ohne Trend')
+    # plt.xlabel('t [s]')
+    # plt.ylabel('Temperatur [°C]')
+
+    # plt.tight_layout()
+    # plt.savefig('plots/neigung_zeitreihe_interp_detrend.png')
+    # plt.show()
+    sys.exit(0)  # Stop execution after task 1
     
     ### AUFGABE 2 ###################################################################################
     """Autokovarianz"""

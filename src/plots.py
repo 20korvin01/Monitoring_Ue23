@@ -55,18 +55,18 @@ def plot_delta_t(timestamps):
     
     # plot
     plt.figure(figsize=(12, 4))
-    plt.plot(blau[:, 0], blau[:, 1], 'b', label='Δt = 120s', marker='o', markersize=2, ls="")
-    plt.plot(rot[:, 0], rot[:, 1], 'r', label='Δt > 120s', marker='o', markersize=2, ls="")
-    plt.plot(gruen[:, 0], gruen[:, 1], 'g', label='Δt < 120s', marker='o', markersize=2, ls="")
+    plt.plot(np.multiply(blau[:, 0], 1/(60*60*24)), blau[:, 1], 'b', label='Δt = 120s', marker='o', markersize=2, ls="")
+    plt.plot(np.multiply(rot[:, 0], 1/(60*60*24)), rot[:, 1], 'r', label='Δt > 120s', marker='o', markersize=2, ls="")
+    plt.plot(np.multiply(gruen[:, 0], 1/(60*60*24)), gruen[:, 1], 'g', label='Δt < 120s', marker='o', markersize=2, ls="")
     
     plt.title('Differenzen der Zeitstempel')
-    plt.xlabel('t [s]')
-    plt.ylabel('Δt [s]')
+    plt.xlabel('t in Tagen')
+    plt.ylabel('Δt in s')
+    plt.xlim(timestamps[0]/(60*60*24), timestamps[-1]/(60*60*24))
     plt.legend()
     plt.tight_layout()
     plt.savefig('plots/delta_t.png')
     plt.show()
-    
     
     
 def plot_autokovarianz(cov_x, cov_y, cov_t):
