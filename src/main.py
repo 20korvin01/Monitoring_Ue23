@@ -232,7 +232,7 @@ if __name__ == "__main__":
     amp_x = amplitudenspektrum(lds_x, dT)
     amp_y= amplitudenspektrum(lds_y, dT)
     # Frequenzachse
-    freqs = np.arange(m) / (2 * m * dT)
+    freqs = np.arange(m) / (m * dT)
     fn = 1/(2*dT)
     f_lim = freqs[1]+fn/2
     plot_leistungsdichtespektrum(freqs,lds_x,lds_y,amp_x,amp_y)
@@ -260,7 +260,7 @@ if __name__ == "__main__":
     plt.xlabel("Frequenz [Hz]")
     plt.ylabel("PSD")
     plt.legend()
-    plt.xlim(0, f_lim) # nur bis zur halben Nyquistfrequenz plotten, da es sich um ein reelles Signal handelt und nur m/2 Werte unabh. sind
+    plt.xlim(0, 1e-4) # nur bis zur halben Nyquistfrequenz plotten, da es sich um ein reelles Signal handelt und nur m/2 Werte unabh. sind
     #
     plt.subplot(2, 1, 2)
     plt.semilogy(freqs, amp_x_scipy, 'r', label='x-Richtung')
@@ -269,7 +269,7 @@ if __name__ == "__main__":
     plt.xlabel("Frequenz [Hz]")
     plt.ylabel("Amplitude")
     plt.legend()
-    plt.xlim(0, f_lim)
+    plt.xlim(0, 1e-4)
 
     plt.tight_layout()
     plt.savefig('plots/leistungsdichtespektrum_scipy.png')
