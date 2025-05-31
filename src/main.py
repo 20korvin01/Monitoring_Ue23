@@ -182,7 +182,7 @@ if __name__ == "__main__":
     ### AUFGABE 2 ###################################################################################
     """Autokovarianz"""
     ## 2.1 Berechnung der Autokovarianz- und Autokorrelationsfunktionen -------------------------- ##
-    lag = n//10 - 3 # n=7080 Datapoints bei dt=120s = 10 Tage und 1h Aufnahmedauer -> 10d+1h /10 = 1d + 6min => 6min = 120s * 3 Aufnahmen
+    lag = n//10 +12# n=7080 Datapoints bei dt=120s = 9 Tage und 20h Aufnahmedauer -> 9d+20h /10 = 23h 36min => 24min = 120s * 12 Aufnahmen, welche pro Tag fehlen
     cov_x = autocovariance(neigung_x_interp_detrend, lag)
     cov_y = autocovariance(neigung_y_interp_detrend, lag)
     cov_t = autocovariance(temperatur_interp_detrend, lag)
@@ -204,7 +204,7 @@ if __name__ == "__main__":
     ### AUFGABE 3 ###################################################################################
     """Kreuzkovarianz"""
     ## 3.1 Berechnung der drei Kombinationen der Kreuzkovarianz und -korrelationsfunktionen ------ ##
-    lag = n//10 -3
+    lag = n//10+12
     crosscov_xy = crosscovariance(neigung_x_interp_detrend, neigung_y_interp_detrend, lag)
     crosscov_xt = crosscovariance(neigung_x_interp_detrend, temperatur_interp_detrend, lag)
     crosscov_yt = crosscovariance(neigung_y_interp_detrend, temperatur_interp_detrend, lag)
@@ -256,21 +256,50 @@ if __name__ == "__main__":
     plt.subplot(2, 1, 1)
     plt.plot(freqs, lds_x_scipy, 'r', label='x-Richtung')
     plt.plot(freqs, lds_y_scipy, 'b', label='y-Richtung')
-    plt.title("Leistungsdichtespektrum")
-    plt.xlabel("Frequenz [Hz]")
-    plt.ylabel("PSD")
+    # plt.title("Leistungsdichtespektrum")
+    plt.xlabel("Frequenz in Hz")
+    plt.ylabel("LDS in Grad²/Hz")
     plt.legend()
-    plt.xlim(0, 1e-4) # nur bis zur halben Nyquistfrequenz plotten, da es sich um ein reelles Signal handelt und nur m/2 Werte unabh. sind
-    #
+    plt.xlim(0, f_lim) # nur bis zur halben Nyquistfrequenz plotten, da es sich um ein reelles Signal handelt und nur m/2 Werte unabh. sind
+
     plt.subplot(2, 1, 2)
     plt.semilogy(freqs, amp_x_scipy, 'r', label='x-Richtung')
     plt.semilogy(freqs, amp_y_scipy, 'b', label='y-Richtung')
-    plt.title("Amplitudenspektrum")
-    plt.xlabel("Frequenz [Hz]")
-    plt.ylabel("Amplitude")
+    # plt.title("Amplitudenspektrum")
+    plt.xlabel("Frequenz in Hz")
+    plt.ylabel("Amplitude in Grad")
     plt.legend()
-    plt.xlim(0, 1e-4)
+    plt.xlim(0, f_lim)
 
     plt.tight_layout()
     plt.savefig('plots/leistungsdichtespektrum_scipy.png')
+
+
+    # Plot zoomed
+    plt.figure(figsize=(10, 8))
+    plt.subplot(2, 1, 1)
+    plt.stem(freqs, lds_x_scipy, 'r', basefmt=" ", label='x-Richtung')
+    plt.stem(freqs, lds_y_scipy, 'b', basefmt=" ", label='y-Richtung')
+    # plt.title("Leistungsdichtespektrum")
+    plt.xlabel("Frequenz in µHz")
+    plt.ylabel("LDS in Grad²/Hz")
+    plt.legend()
+    plt.xlim(0, 1e-4)
+    plt.ylim(bottom=0)
+    plt.xticks(freqs[:9],[f"{val:.3f}" for val in freqs[:9]*1e6])
+
+    plt.subplot(2, 1, 2)
+    plt.stem(freqs, amp_x_scipy, 'r', basefmt=" ", label='x-Richtung')
+    plt.stem(freqs, amp_y_scipy, 'b', basefmt=" ", label='y-Richtung')
+    # plt.title("Amplitudenspektrum")
+    # plt.yscale('log')
+    plt.xlabel("Frequenz in µHz")
+    plt.ylabel("Amplitude in Grad")
+    plt.legend()
+    plt.xlim(0, 1e-4)
+    plt.ylim(bottom=0)
+    plt.xticks(freqs[:9],[f"{val:.3f}" for val in freqs[:9]*1e6])
+
+    plt.tight_layout()
+    plt.savefig('plots/LDS_zoomed_scipy.png')
     plt.show()
