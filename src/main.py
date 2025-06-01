@@ -139,7 +139,7 @@ if __name__ == "__main__":
     ### AUFGABE 0 ####################################################################################
     """Laden und Darstellen der Messwerte"""
     # Laden der Messwerte
-    mat_contents = scipy.io.loadmat('data/Neigung.mat')
+    mat_contents = scipy.io.loadmat('../data/Neigung.mat')
     # Neigung-x, Neigung-y, Temperatur, Zeit in s || Abtastinterval: 120s
     neigung_zeitreihe = np.array(mat_contents['N'])
     #print(neigung_zeitreihe.shape)
@@ -222,7 +222,7 @@ if __name__ == "__main__":
     plt.tight_layout()
     plt.suptitle('Messdaten mit Lücken', fontsize=16)
     plt.subplots_adjust(top=0.9)
-    plt.savefig('plots/neigung_x_zeitreihe_luecken.png')
+    plt.savefig('../plots/neigung_x_zeitreihe_luecken.png')
     #plt.show()
 
     ## 1.2 Füllen der Datenlücken durch lineare Interpolation ------------------------------------- ##
@@ -304,7 +304,7 @@ if __name__ == "__main__":
     plt.tight_layout()
     plt.suptitle('Interpolierte Messdaten', fontsize=16)
     plt.subplots_adjust(top=0.95)
-    plt.savefig('plots/interpoliert.png')
+    plt.savefig('../plots/interpoliert.png')
 
     # Trendbereinigte Daten
     plt.figure(figsize=(12, 8))
@@ -327,7 +327,7 @@ if __name__ == "__main__":
     plt.tight_layout()
     plt.suptitle('Interpolierte und trendbereinigte Messdaten', fontsize=16)
     plt.subplots_adjust(top=0.95)
-    plt.savefig('plots/detrend.png')
+    plt.savefig('../plots/detrend.png')
 
     # plt.figure(figsize=(12, 4))
     # # Neigung x
@@ -357,7 +357,7 @@ if __name__ == "__main__":
     # plt.tight_layout()
     # plt.savefig('plots/neigung_zeitreihe_interp_detrend.png')
     # plt.show()
-    sys.exit(0)  # Stop execution after task 1
+    # sys.exit(0)  # Stop execution after task 1
     
     ### AUFGABE 2 ###################################################################################
     """Autokovarianz"""
@@ -404,17 +404,18 @@ if __name__ == "__main__":
     ## 4.1 Berechnung der Leistungs- und Amplitudenspektren -------------------------------------- ##
     # Daten berechnen
     m = len(acf_y)  # Anzahl der Lags
-    lds_y = abs(leistungsdichtespektrum(acf_y, dT))# Absolutwert, um negative Werte zu vermeiden
-    lds_x = abs(leistungsdichtespektrum(acf_x, dT))
-    np.savetxt('data/leistungsdichtespektrum_x.txt', lds_x)
-    np.savetxt('data/leistungsdichtespektrum_y.txt', lds_y)
+    lds_y = abs(dft(acf_y))# Absolutwert, um negative Werte zu vermeiden
+    lds_x = abs(dft(acf_x))
+    np.savetxt('../data/leistungsdichtespektrum_x.txt', lds_x)
+    np.savetxt('../data/leistungsdichtespektrum_y.txt', lds_y)
 
     amp_x = amplitudenspektrum(lds_x, dT)
     amp_y= amplitudenspektrum(lds_y, dT)
     # Frequenzachse
     freqs = np.arange(m) / (m * dT)
     fn = 1/(2*dT)
-    f_lim = freqs[1]+fn/2
+    # f_lim = freqs[1]+fn/2
+    f_lim = freqs[1]+fn
     plot_leistungsdichtespektrum(freqs,lds_x,lds_y,amp_x,amp_y)
 
 
@@ -425,8 +426,8 @@ if __name__ == "__main__":
     lds_x_scipy = abs(scipy.fft.fft(acf_x))
     lds_y_scipy = abs(scipy.fft.fft(acf_y))
 
-    np.savetxt('data/leistungsdichtespektrum_scipy_x.txt', lds_x_scipy)
-    np.savetxt('data/leistungsdichtespektrum_scipy_y.txt', lds_y_scipy)
+    np.savetxt('../data/leistungsdichtespektrum_scipy_x.txt', lds_x_scipy)
+    np.savetxt('../data/leistungsdichtespektrum_scipy_y.txt', lds_y_scipy)
 
     amp_x_scipy = amplitudenspektrum(lds_x_scipy, dT)
     amp_y_scipy = amplitudenspektrum(lds_y_scipy, dT)
@@ -452,7 +453,7 @@ if __name__ == "__main__":
     plt.xlim(0, f_lim)
 
     plt.tight_layout()
-    plt.savefig('plots/leistungsdichtespektrum_scipy.png')
+    plt.savefig('../plots/leistungsdichtespektrum_scipy.png')
 
 
     # Plot zoomed
@@ -481,5 +482,5 @@ if __name__ == "__main__":
     plt.xticks(freqs[:9],[f"{val:.3f}" for val in freqs[:9]*1e6])
 
     plt.tight_layout()
-    plt.savefig('plots/LDS_zoomed_scipy.png')
+    plt.savefig('../plots/LDS_zoomed_scipy.png')
     plt.show()

@@ -38,7 +38,7 @@ def plot_neigungsdaten(neigung_zeitreihe):
     plt.ylabel('Temperatur in °C')
 
     plt.tight_layout()
-    plt.savefig('plots/neigung_zeitreihe.png')
+    plt.savefig('../plots/neigung_zeitreihe.png')
     plt.show()
 
 
@@ -68,7 +68,7 @@ def plot_delta_t(timestamps):
     plt.xlim(timestamps[0]/(60*60*24), timestamps[-1]/(60*60*24))
     plt.legend()
     plt.tight_layout()
-    plt.savefig('plots/delta_t.png')
+    plt.savefig('../plots/delta_t.png')
     plt.show()
     
     
@@ -103,7 +103,7 @@ def plot_autokovarianz(cov_x, cov_y, cov_t):
     plt.ylabel('Autokovarianz')
 
     plt.tight_layout()
-    plt.savefig('plots/autokovarianz_zeitreihe.png')
+    plt.savefig('../plots/autokovarianz_zeitreihe.png')
     plt.show()
 
 
@@ -139,7 +139,7 @@ def plot_autokorrelation(acf_x, acf_y, acf_t):
     plt.ylabel('Autokorrelationskoeffizient')
 
     plt.tight_layout()
-    plt.savefig('plots/autokorrelation_zeitreihe.png')
+    plt.savefig('../plots/autokorrelation_zeitreihe.png')
     plt.show()
 
 
@@ -175,7 +175,7 @@ def plot_kreuzkovarianz(crosscov_xy, crosscov_xt, crosscov_yt):
     plt.ylabel('Kreuzkovarianz')
 
     plt.tight_layout()
-    plt.savefig('plots/kreuzkovarianz_zeitreihe.png')
+    plt.savefig('../plots/kreuzkovarianz_zeitreihe.png')
     plt.show()
 
 
@@ -211,12 +211,13 @@ def plot_kreuzkorrelation(crosscorr_xy, crosscorr_xt, crosscorr_yt):
     plt.ylabel('Kreuzkorrelationskoeffizient')
 
     plt.tight_layout()
-    plt.savefig('plots/kreuzkorrelation_zeitreihe.png')
+    plt.savefig('../plots/kreuzkorrelation_zeitreihe.png')
     plt.show()
 
 def plot_leistungsdichtespektrum(freqs,lds_x,lds_y,amp_x,amp_y):
-    fn = freqs[1]*len(freqs)
-    f_lim = freqs[1]+fn/2
+    fn = 1/(2/freqs[-1])
+    # f_lim = freqs[1]+fn/2
+    f_lim = fn+freqs[1]
     # Plot
     plt.figure(figsize=(10, 8))
     plt.subplot(2, 1, 1)
@@ -240,7 +241,7 @@ def plot_leistungsdichtespektrum(freqs,lds_x,lds_y,amp_x,amp_y):
     plt.xlim(0, f_lim)
 
     plt.tight_layout()
-    plt.savefig('plots/leistungsdichtespektrum.png')
+    plt.savefig('../plots/leistungsdichtespektrum.png')
 
 
     # Plot zoomed
@@ -269,4 +270,4 @@ def plot_leistungsdichtespektrum(freqs,lds_x,lds_y,amp_x,amp_y):
     plt.xticks(freqs[:9],[f"{val:.3f}" for val in freqs[:9]*1e6])
 
     plt.tight_layout()
-    plt.savefig('plots/LDS_zoomed.png')
+    plt.savefig('../plots/LDS_zoomed.png')
